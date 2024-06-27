@@ -5,8 +5,7 @@
   "scripts": {
     "build": "tsc",
     "watch": "tsc -w",
-    "start": "concurrently -k -n COMPILER,SERVE \"npm run watch\" \"nodemon dist/index.js\"",
-    "prepare": "npm run build"
+    "start": "concurrently -k -n COMPILER,SERVE \"npm run watch\" \"nodemon dist/index.js\""
   },
   "keywords": [],
   "author": "",
