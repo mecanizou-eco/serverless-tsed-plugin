@@ -12,6 +12,9 @@
   "author": "",
   "license": "ISC",
   "description": "",
+  "dependencies": {
+    "ts-morph": "^22.0.0"
+  },
   "devDependencies": {
     "concurrently": "^8.2.2",
     "glob": "^10.4.1",
@@ -26,6 +29,8 @@
     "@types/yamljs": "^0.2.34",
     "express": "^4.19.2",
     "reflect-metadata": "^0.2.2",
-    "typescript": "^5.4.5"
+    "typescript": "^5.4.5",
+    "@tsed/cli-generate-swagger": "^5.1.0",
+    "@tsed/cli-core": "^5.1.0"
   }
 }
