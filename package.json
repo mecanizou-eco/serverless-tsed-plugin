@@ -1,11 +1,12 @@
 {
   "name": "serverless-tsed-plugin",
-  "version": "1.0.0",
+  "version": "0.1.0",
   "main": "dist/index.js",
   "scripts": {
     "build": "tsc",
     "watch": "tsc -w",
-    "start": "concurrently -k -n COMPILER,SERVE \"npm run watch\" \"nodemon dist/index.js\""
+    "start": "concurrently -k -n COMPILER,SERVE \"npm run watch\" \"nodemon dist/index.js\"",
+    "prepare": "npm run build"
   },
   "keywords": [],
   "author": "",
