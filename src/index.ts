@@ -521,7 +521,7 @@ class TsEDPlugin {
             ...functions,
             ...service.functions,
         };
-        console.log(JSON.stringify(service.functions))
+
         this.serverless.service.update({
             functions: service.functions
         });
