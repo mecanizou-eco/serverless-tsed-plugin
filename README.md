@@ -200,3 +200,9 @@ custom:
       HeaderName: Authorization
 ```
 
+## Example
+
+You can see an example at the following URL: https://github.com/mecanizou-eco/serverless-tsed-plugin/tree/master/example.
+
+Additionally, ensure to rename the env-model.yml file to env.yml
+

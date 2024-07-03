@@ -1,0 +1,12 @@
+REGION: 'us-east-1'
+STAGE: 'local'
+NODE_VERSION: nodejs18.x
+COSTCENTER: 'Cost Center'
+API_GATEWAY_TAG_NAME: 'API Gateway Name'
+COGNITO_LAMBDA_ROLE: 'cognito-lambda-role'
+HTTP_LOCAL_PORT: 4111
+LAMBDA_LOCAL_PORT: 4311
+lambdaVariables:
+  VERSION: "v1"
+  ACCESS_CONTROL_ALLOW_ORIGIN: '*'
+  LOG_LEVEL: "DEBUG"

@@ -1,0 +1,127 @@
+{
+  "name": "boilerplate",
+  "author": "Mecanizou",
+  "version": "0.0.1",
+  "scripts": {
+    "node": "ts-node -r tsconfig-paths/register /Users/jhonatan/Workspace/serverless-tsed-plugin/example/node_modules/serverless-tsed-plugin/dist/generate-tsed-swagger.ts generate-swagger --output ./.tsed/swagger",
+    "lint": "eslint 'src/**/*.ts'",
+    "lint:fix": "eslint 'src/**/*.ts' --fix",
+    "start": "sls offline --host 0.0.0.0 --reloadHandler",
+    "doctor": "sls doctor",
+    "build": "sls package",
+    "deploy": "sls deploy",
+    "destroy": "sls remove",
+    "test": "jest --coverage --detectOpenHandles",
+    "test:watch": "jest --watch",
+    "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
+    "test:e2e": "jest --config ./test/jest-e2e.json",
+    "prepare{remove-this-to-use-husky}": "husky install",
+    "format": "prettier --write \"**/*.{ts,tsx,md}\"",
+    "preinstall": "./scripts/preinstall.sh"
+  },
+  "publishConfig": {
+    "registry": "http://localhost:4873"
+  },
+  "lint-staged": {
+    "**/*.{js,jsx,ts,tsx}": [
+      "npx prettier --write",
+      "npx eslint --fix"
+    ]
+  },
+  "jest": {
+    "moduleFileExtensions": [
+      "js",
+      "json",
+      "ts"
+    ],
+    "rootDir": "src",
+    "testRegex": ".*\\.spec\\.ts$",
+    "transform": {
+      "^.+\\.(t|j)s$": "ts-jest"
+    },
+    "collectCoverageFrom": [
+      "**/*.(t|j)s"
+    ],
+    "coverageDirectory": "../coverage",
+    "testResultsProcessor": "jest-sonar-reporter",
+    "setupFilesAfterEnv": [
+      "<rootDir>/shared/test/setup.jest.ts"
+    ],
+    "testEnvironment": "node"
+  },
+  "jestSonar": {
+    "reportPath": "reports",
+    "reportFile": "test-reporter.xml",
+    "indent": 4
+  },
+  "dependencies": {
+    "@tsed/components-scan": "^7.75.0",
+    "@tsed/ajv": "^7.75.0",
+    "@tsed/common": "^7.75.0",
+    "@tsed/core": "^7.75.0",
+    "@tsed/di": "^7.75.0",
+    "@tsed/engines": "^7.75.0",
+    "@tsed/exceptions": "^7.75.0",
+    "@tsed/json-mapper": "^7.75.0",
+    "@tsed/logger": "^6.7.5",
+    "@tsed/logger-file": "^6.7.5",
+    "@tsed/openspec": "^7.75.0",
+    "@tsed/platform-cache": "^7.75.0",
+    "@tsed/platform-exceptions": "^7.75.0",
+    "@tsed/platform-express": "^7.75.0",
+    "@tsed/platform-log-middleware": "^7.75.0",
+    "@tsed/platform-middlewares": "^7.75.0",
+    "@tsed/platform-params": "^7.75.0",
+    "@tsed/platform-response-filter": "^7.75.0",
+    "@tsed/platform-views": "^7.75.0",
+    "@tsed/schema": "^7.75.0",
+    "@tsed/platform-serverless": "^7.75.0",
+    "@types/aws-lambda": "^8.10.136",
+    "@types/jest": "^29.5.11",
+    "@types/jsonwebtoken": "^9.0.5",
+    "@types/jwk-to-pem": "^2.0.3",
+    "@types/node": "^20.9.4",
+    "@typescript-eslint/eslint-plugin": "^6.12.0",
+    "@typescript-eslint/parser": "^6.12.0",
+    "jsonwebtoken": "^9.0.2",
+    "jwk-to-pem": "^2.0.5",
+    "reflect-metadata": "^0.1.13",
+    "rxjs": "^7.8.1",
+    "source-map-support": "^0.5.21",
+    "ts-morph": "^22.0.0",
+    "tsyringe": "^4.8.0",
+    "ajv": "^8.16.0"
+  },
+  "devDependencies": {
+    "core-js": "^3.33.3",
+    "eslint": "^8.54.0",
+    "eslint-config-prettier": "9.1.0",
+    "eslint-config-standard": "^17.1.0",
+    "eslint-plugin-import": "^2.29.0",
+    "eslint-plugin-node": "^11.1.0",
+    "eslint-plugin-promise": "^6.1.1",
+    "eslint-plugin-standard": "^4.1.0",
+    "find-my-way": "^8.1.0",
+    "fork-ts-checker-webpack-plugin": "^9.0.2",
+    "glob": "^10.3.10",
+    "husky": "^8.0.0",
+    "jest": "^29.7.0",
+    "jest-sonar-reporter": "^2.0.0",
+    "js-yaml": "^4.1.0",
+    "lint-staged": "^15.2.0",
+    "nodemon": "^3.1.2",
+    "prettier": "^3.1.0",
+    "serverless": "3.37.0",
+    "serverless-offline": "^13.3.0",
+    "serverless-plugin-resource-tagging": "^1.2.0",
+    "serverless-tsed-plugin": "^0.1.4",
+    "serverless-webpack": "^5.13.0",
+    "terser-webpack-plugin": "^5.3.10",
+    "ts-jest": "^29.1.1",
+    "ts-loader": "^9.5.1",
+    "typescript": "^4.9.5",
+    "webpack": "^5.89.0",
+    "webpack-node-externals": "^3.0.0",
+    "method-override": "^3.0.0"
+  }
+}

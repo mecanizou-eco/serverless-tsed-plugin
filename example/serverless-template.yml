@@ -1,0 +1,113 @@
+plugins:
+  - serverless-tsed-plugin
+  - serverless-webpack
+  - serverless-offline
+  - serverless-plugin-resource-tagging
+
+custom:
+  tsedPlugin:
+    patterns:
+      module: [ "**/*module.ts" ]
+      controller: [ "**/*controller.ts" ]
+    environment: ${self:apiEnvs}
+    memorySize: ${self:custom.defaults.functions.defaultMemorySize}
+    authorizer:
+      functionName: authorizer
+      HeaderName: Authorization
+    events:
+      http:
+        cors: true
+
+  defaults:
+    general:
+      tags:
+        Environment: ${self:config.globalEnvs.STAGE}
+        CostCenter: ${self:config.globalEnvs.COSTCENTER}
+        Project: ${self:service}
+    functions:
+      defaultMemorySize: 512
+      authorizer:
+        memorySize: 512
+        name: authorizer
+        identitySource: method.request.header.Authorization
+        type: token
+
+  serverless-offline:
+    lambdaPort: ${self:config.globalEnvs.LAMBDA_LOCAL_PORT}
+    httpPort: ${self:config.globalEnvs.HTTP_LOCAL_PORT}
+
+  webpack:
+    webpackConfig: ${self:config.rootPath}webpack.config.js
+    concurrency: 10
+    serializedCompile: true
+
+provider:
+  name: aws
+  runtime: ${self:config.globalEnvs.NODE_VERSION}
+  timeout: 30
+  httpApi:
+    cors: true
+  stage: ${self:config.globalEnvs.STAGE}
+  region: ${self:config.globalEnvs.REGION}
+  iam:
+    role: !Sub arn:aws:iam::${AWS::AccountId}:role/CompanyLambdaExecutionRole
+  stackTags:
+    Environment: ${self:config.globalEnvs.STAGE}
+    CostCenter: ${self:config.globalEnvs.COSTCENTER}
+    Project: ${self:service}
+    Name: 'API Gateway Account Stage'
+
+package:
+  individually: true
+
+Resources:
+  GatewayResponseDefault4XX:
+    Type: 'AWS::ApiGateway::GatewayResponse'
+    Properties:
+      ResponseParameters:
+        gatewayresponse.header.Access-Control-Allow-Origin: "'*'"
+        gatewayresponse.header.Access-Control-Allow-Headers: "'*'"
+      ResponseType: DEFAULT_4XX
+      RestApiId:
+        Ref: 'ApiGatewayRestApi'
+
+  GatewayResponseDefault5XX:
+    Type: 'AWS::ApiGateway::GatewayResponse'
+    Properties:
+      ResponseParameters:
+        gatewayresponse.header.Access-Control-Allow-Origin: "'*'"
+        gatewayresponse.header.Access-Control-Allow-Headers: "'*'"
+      ResponseType: DEFAULT_4XX
+      RestApiId:
+        Ref: 'ApiGatewayRestApi'
+
+  ApiGatewayRestApi:
+    Type: 'AWS::ApiGateway::RestApi'
+    Properties:
+      Name: ${self:config.globalEnvs.STAGE}-${self::service}
+      Tags:
+        - Key: Environment
+          Value: ${self:config.globalEnvs.STAGE}
+        - Key: CostCenter
+          Value: ${self:config.globalEnvs.COSTCENTER}
+        - Key: Project
+          Value: ${self:service}
+        - Key: Name
+          Value: ${self:config.globalEnvs.API_GATEWAY_TAG_NAME}
+
+  WebsocketsApi:
+    Type: 'AWS::ApiGatewayV2::Api'
+    Properties:
+      Name: ${self:config.globalEnvs.STAGE}-${self:service}
+      ProtocolType: WEBSOCKET
+      RouteSelectionExpression: "$request.body.action"
+      Tags:
+        Environment: ${self:config.globalEnvs.STAGE}
+        CostCenter: ${self:config.globalEnvs.COSTCENTER}
+        Project: ${self:service}
+        Name: ${self:config.globalEnvs.API_GATEWAY_TAG_NAME}
+
+  AuthorizerApiGatewayAuthorizer:
+    Type: AWS::ApiGateway::Authorizer
+    Properties:
+      AuthorizerResultTtlInSeconds: 0

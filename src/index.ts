@@ -484,16 +484,21 @@ class TsEDPlugin {
 
         const command = `ts-node -r tsconfig-paths/register ${__dirname}/generate-tsed-swagger.ts generate-swagger --output ./.tsed/swagger`;
 
-        exec(command, { env }, (error, stdout, stderr) => {
-            console.log(`stdout: ${stdout}`);
-            if (error) {
-                console.error(`Error: ${error.message}`);
-                return;
-            }
-            if (stderr) {
-                console.error(`stderr: ${stderr}`);
-                return;
-            }
+        return new Promise((resolve, reject) => {
+            exec(command, {env}, (error, stdout, stderr) => {
+                if (error) {
+                    console.error(`Error: ${error.message}`);
+                    reject(error);
+                    return;
+                }
+                if (stderr) {
+                    console.error(`stderr: ${stderr}`);
+                    reject(stderr);
+                }
+
+                console.log(`stdout: ${stdout}`);
+                resolve(stdout);
+            });
         });
     }
 

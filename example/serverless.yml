@@ -1,0 +1,44 @@
+service: apiname
+
+config:
+  rootPath: './'
+  globalEnvs: ${file(./env.yml)}
+
+apiEnvs: ${self:config.globalEnvs.lambdaVariables}
+
+template: ${file(${self:config.rootPath}serverless-template.yml)}
+
+plugins: ${self:template.plugins}
+
+custom:
+  defaults:
+    functions: ${self:template.custom.defaults.functions}
+
+  tsedPlugin: ${self:template.custom.tsedPlugin}
+
+  serverless-offline: ${self:template.custom.serverless-offline}
+
+  webpack: ${self:template.custom.webpack}
+
+provider: ${self:template.provider}
+
+functions:
+  authorizer:
+    handler: src/modules/auth/authorizer/authorizer-controller.handler
+    memorySize: ${self:custom.defaults.functions.defaultMemorySize}
+    environment: ${self:apiEnvs}
+    role: !Sub arn:aws:iam::${AWS::AccountId}:role/${self:config.globalEnvs.COGNITO_LAMBDA_ROLE}
+    tags:
+      Environment: ${self:template.custom.defaults.general.tags.Environment}
+      CostCenter: ${self:template.custom.defaults.general.tags.CostCenter}
+      Project: ${self:template.custom.defaults.general.tags.Project}
+      Name: 'Authorizer'
+
+package: ${self:template.package}
+
+resources:
+  Resources:
+    ApiGatewayRestApi: ${self:template.Resources.ApiGatewayRestApi}
+    GatewayResponseDefault4XX: ${self:template.Resources.GatewayResponseDefault4XX}
+    GatewayResponseDefault5XX: ${self:template.Resources.GatewayResponseDefault5XX}
+    AuthorizerApiGatewayAuthorizer: ${self:template.Resources.AuthorizerApiGatewayAuthorizer}
