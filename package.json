@@ -1,6 +1,6 @@
 {
   "name": "serverless-tsed-plugin",
-  "version": "0.1.3",
+  "version": "0.1.2",
   "main": "dist/index.js",
   "scripts": {
     "cp": "copyfiles -u 1 src/generate-tsed-swagger.ts dist/ && copyfiles -u 0 tsconfig.json dist/",
