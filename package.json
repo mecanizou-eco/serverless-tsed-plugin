@@ -7,20 +7,25 @@
     "watch": "tsc -w",
     "start": "concurrently -k -n COMPILER,SERVE \"npm run watch\" \"nodemon dist/index.js\""
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mecanizou-eco/serverless-tsed-plugin"
+  },
+  "keywords": [
+    "serverless",
+    "serverless framework",
+    "serverless plugin"
+  ],
+  "author": "mecanizou",
+  "license": "MIT",
   "description": "",
   "dependencies": {
-    "ts-morph": "^22.0.0",
+    "@tsed/cli-core": "^5.1.0",
     "@tsed/cli-generate-swagger": "^5.1.0",
-    "@tsed/cli-core": "^5.1.0"
+    "ts-morph": "^22.0.0"
   },
   "devDependencies": {
-    "concurrently": "^8.2.2",
-    "glob": "^10.4.1",
-    "serverless": "^4.0.24",
-    "yamljs": "^0.3.0",
+    "@tsconfig/node18": "^18.2.4",
     "@tsed/common": "^7.71.1",
     "@tsed/core": "^7.71.1",
     "@tsed/di": "^7.71.1",
@@ -28,8 +33,13 @@
     "@tsed/swagger": "^7.71.1",
     "@types/serverless": "^3.12.22",
     "@types/yamljs": "^0.2.34",
+    "concurrently": "^8.2.2",
     "express": "^4.19.2",
+    "glob": "^10.4.1",
+    "nodemon": "~3.1.4",
     "reflect-metadata": "^0.2.2",
-    "typescript": "^5.4.5"
+    "serverless": "^4.0.24",
+    "typescript": "^5.4.5",
+    "yamljs": "^0.3.0"
   }
 }

@@ -482,7 +482,7 @@ class TsEDPlugin {
         const env = Object.create(process.env);
         env.CONTROLLERS_PATTERNS = patternsController.map(pattern => path.join(process.cwd(), pattern)).join(",");
 
-        const command = `ts-node -r tsconfig-paths/register ${__dirname}/../src/generate-tsed-swagger.ts generate-swagger --output ./.tsed/swagger`;
+        const command = `ts-node -r tsconfig-paths/register ${__dirname}/generate-tsed-swagger.js generate-swagger --output ./.tsed/swagger`;
 
         exec(command, { env }, (error, stdout, stderr) => {
             console.log(`stdout: ${stdout}`);
