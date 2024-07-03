@@ -1,6 +1,6 @@
 {
   "name": "serverless-tsed-plugin",
-  "version": "0.1.5",
+  "version": "0.1.6",
   "main": "dist/index.js",
   "scripts": {
     "cp": "cpx tsconfig.json dist/ && cpx src/generate-tsed-swagger.ts dist/",
@@ -13,9 +13,19 @@
     "url": "https://github.com/mecanizou-eco/serverless-tsed-plugin"
   },
   "keywords": [
+    "tsed",
     "serverless",
+    "documentation",
+    "swagger",
+    "validation",
     "serverless framework",
-    "serverless plugin"
+    "serverless plugin",
+    "aws",
+    "plugin",
+    "typescript",
+    "auto-generation",
+    "code-generation",
+    "framework"
   ],
   "author": "mecanizou",
   "license": "MIT",
