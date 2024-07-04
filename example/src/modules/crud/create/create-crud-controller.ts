@@ -24,12 +24,12 @@ export class CreateCrudController {
 	@Post('/')
 	@Summary('Cria dados')
 	@Description('Description de criação')
-	@In('header')
+	@(In('header')
 		.Name('authorization')
 		.Type(String)
-		.Description('Bearer authorization')
+		.Description('Bearer authorization'))
 	@Returns(200, CreateCrudResponseDto)
-	@Returns(404, CreateCrudRequestDto).Description('')
+	@(Returns(404, CreateCrudRequestDto).Description(''))
 	async handler(
 		@BodyParams() body: CreateCrudRequestDto,
 		@Context() $ctx: ServerlessContext

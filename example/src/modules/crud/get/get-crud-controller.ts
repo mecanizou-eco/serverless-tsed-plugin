@@ -17,10 +17,10 @@ export class GetCrudController {
 
 	@Get('/:id')
 	@Summary('Pega dados')
-	@In('header')
+	@(In('header')
 		.Name('authorization')
 		.Type(String)
-		.Description('Bearer authorization')
+		.Description('Bearer authorization'))
 	@Returns(200, GetCrudResponseDto)
 	@Description('Description')
 	async handler(

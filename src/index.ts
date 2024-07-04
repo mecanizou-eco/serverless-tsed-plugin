@@ -89,7 +89,7 @@ class TsEDPlugin {
         method.forEachDescendant(node => {
             if (node.getKind() === SyntaxKind.Decorator) {
                 const decoratorText = node.getText();
-                const parts = decoratorText.match(/@(\w+)\(([^)]*)\)/);
+                const parts = decoratorText.match(/@\(?(\w+)\(([^)]*)\)/);
                 if (!parts) return;
 
                 const decoratorName = parts[1];

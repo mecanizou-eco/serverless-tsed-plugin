@@ -16,10 +16,10 @@ export class ListCrudController {
 
 	@Get('/')
 	@Summary('Cria dados')
-	@In('header')
+	@(In('header')
 		.Name('authorization')
 		.Type(String)
-		.Description('Bearer authorization')
+		.Description('Bearer authorization'))
 	@Returns(200, ListCrudResponseDto)
 	@Description('Description')
 	async handler(
