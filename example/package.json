@@ -55,9 +55,9 @@
     "indent": 4
   },
   "dependencies": {
-    "@tsed/components-scan": "^7.75.0",
     "@tsed/ajv": "^7.75.0",
     "@tsed/common": "^7.75.0",
+    "@tsed/components-scan": "^7.75.0",
     "@tsed/core": "^7.75.0",
     "@tsed/di": "^7.75.0",
     "@tsed/engines": "^7.75.0",
@@ -73,9 +73,9 @@
     "@tsed/platform-middlewares": "^7.75.0",
     "@tsed/platform-params": "^7.75.0",
     "@tsed/platform-response-filter": "^7.75.0",
+    "@tsed/platform-serverless": "^7.75.0",
     "@tsed/platform-views": "^7.75.0",
     "@tsed/schema": "^7.75.0",
-    "@tsed/platform-serverless": "^7.75.0",
     "@types/aws-lambda": "^8.10.136",
     "@types/jest": "^29.5.11",
     "@types/jsonwebtoken": "^9.0.5",
@@ -83,14 +83,14 @@
     "@types/node": "^20.9.4",
     "@typescript-eslint/eslint-plugin": "^6.12.0",
     "@typescript-eslint/parser": "^6.12.0",
+    "ajv": "^8.16.0",
     "jsonwebtoken": "^9.0.2",
     "jwk-to-pem": "^2.0.5",
     "reflect-metadata": "^0.1.13",
     "rxjs": "^7.8.1",
     "source-map-support": "^0.5.21",
     "ts-morph": "^22.0.0",
-    "tsyringe": "^4.8.0",
-    "ajv": "^8.16.0"
+    "tsyringe": "^4.8.0"
   },
   "devDependencies": {
     "core-js": "^3.33.3",
@@ -109,19 +109,20 @@
     "jest-sonar-reporter": "^2.0.0",
     "js-yaml": "^4.1.0",
     "lint-staged": "^15.2.0",
+    "method-override": "^3.0.0",
     "nodemon": "^3.1.2",
     "prettier": "^3.1.0",
     "serverless": "3.37.0",
     "serverless-offline": "^13.3.0",
     "serverless-plugin-resource-tagging": "^1.2.0",
-    "serverless-tsed-plugin": "^0.1.6",
+    "serverless-tsed-plugin": "^0.1.7",
     "serverless-webpack": "^5.13.0",
     "terser-webpack-plugin": "^5.3.10",
     "ts-jest": "^29.1.1",
     "ts-loader": "^9.5.1",
+    "ts-node": "^10.9.2",
     "typescript": "^4.9.5",
     "webpack": "^5.89.0",
-    "webpack-node-externals": "^3.0.0",
-    "method-override": "^3.0.0"
+    "webpack-node-externals": "^3.0.0"
   }
 }

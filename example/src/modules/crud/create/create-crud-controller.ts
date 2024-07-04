@@ -1,17 +1,9 @@
 import 'reflect-metadata'
 import { Controller, Inject } from '@tsed/di'
 import {
-	Default,
 	Description,
-	Format,
 	In,
-	Maximum,
-	MaxLength,
-	Minimum,
-	MinLength,
-	Pattern,
 	Post,
-	Required,
 	Returns,
 	Summary,
 } from '@tsed/schema'
@@ -22,33 +14,7 @@ import {
 	ServerlessContext,
 } from '@tsed/platform-serverless'
 import { CreateCrudService } from './create-crud-service'
-
-class Response1 {
-	@MinLength(3)
-	@MaxLength(50)
-	indexed!: string
-}
-
-class Request {
-	@Required()
-	unique!: string
-
-	@MinLength(3)
-	@MaxLength(50)
-	indexed!: string
-
-	@Minimum(0)
-	@Maximum(100)
-	@Default(0)
-	rate: number = 0
-
-	@Pattern(/[a-z]/)
-	pattern!: string
-
-	@Format('date-time')
-	@Default(Date.now)
-	dateCreation: Date = new Date()
-}
+import { CreateCrudResponseDto, CreateCrudRequestDto } from "./create-crud-dto";
 
 @Controller('/crud')
 export class CreateCrudController {
@@ -62,13 +28,13 @@ export class CreateCrudController {
 		.Name('authorization')
 		.Type(String)
 		.Description('Bearer authorization')
-	@Returns(200, Request)
-	@Returns(404, Response1).Description('')
+	@Returns(200, CreateCrudResponseDto)
+	@Returns(404, CreateCrudRequestDto).Description('')
 	async handler(
-		@BodyParams() body: Request,
+		@BodyParams() body: CreateCrudRequestDto,
 		@Context() $ctx: ServerlessContext
-	): Promise<Request> {
-		const response: Request = await this.service.execute(body)
+	): Promise<CreateCrudRequestDto> {
+		const response: CreateCrudRequestDto = await this.service.execute(body)
 
 		$ctx.response.setHeaders(
 			HeadersResponseHelper.getInstance().getDefaultHeaders()

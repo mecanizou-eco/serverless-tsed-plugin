@@ -7,8 +7,8 @@ plugins:
 custom:
   tsedPlugin:
     patterns:
-      module: [ "**/*module.ts" ]
-      controller: [ "**/*controller.ts" ]
+      module: [ "src/**/*module.ts" ]
+      controller: [ "src/**/*controller.ts" ]
     environment: ${self:apiEnvs}
     memorySize: ${self:custom.defaults.functions.defaultMemorySize}
     authorizer:

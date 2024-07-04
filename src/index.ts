@@ -121,7 +121,9 @@ class TsEDPlugin {
                     decorators.forEach(decorator => {
                         if (decorator.getText().includes(decoratorName)) {
                             const paramName = param.getName();
-                            const paramType = param.getType().getText();
+                            const paramTypeObj = param.getType();
+                            const paramTypeSymbol = paramTypeObj.getSymbol();
+                            const paramType = paramTypeSymbol ? paramTypeSymbol.getName() : paramTypeObj.getText();
 
                             decoratorStructure[decoratorName][index] = { values: [], children: {} };
 

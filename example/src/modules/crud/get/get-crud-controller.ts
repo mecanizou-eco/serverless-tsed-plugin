@@ -8,10 +8,7 @@ import {
 	ServerlessContext,
 } from '@tsed/platform-serverless'
 import { GetCrudService } from './get-crud-service'
-
-class Response {
-	[key: string]: any;
-}
+import {GetCrudResponseDto} from "./get-crud-dto";
 
 @Controller('/crud')
 export class GetCrudController {
@@ -24,15 +21,15 @@ export class GetCrudController {
 		.Name('authorization')
 		.Type(String)
 		.Description('Bearer authorization')
-	@Returns(200, Response)
+	@Returns(200, GetCrudResponseDto)
 	@Description('Description')
 	async handler(
 		@PathParams('id') id: number,
 		@QueryParams('param') param: string,
 		@QueryParams('param2') param2: number,
 		@Context() $ctx: ServerlessContext
-	): Promise<Response> {
-		const response: Response = await this.service.execute()
+	): Promise<GetCrudResponseDto> {
+		const response: GetCrudResponseDto = await this.service.execute()
 
 		$ctx.response.setHeaders(
 			HeadersResponseHelper.getInstance().getDefaultHeaders()
