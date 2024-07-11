@@ -39,7 +39,7 @@ class TsEDPlugin {
         this.serverless = serverless;
         this.options = options;
         this.hooks = {
-            "before:package:createDeploymentArtifacts": this.beforePackage.bind(this),
+            "before:package:initialize": this.beforePackage.bind(this),
             "before:offline:start": this.beforePackage.bind(this),
         };
     }
@@ -318,6 +318,8 @@ class TsEDPlugin {
                         const functionName = this.generateFunctionName(methodType, controllerPath, methodPath);
                         const decorators = this.getDecoratorStructure(method.key, cls);
                         const formattedMethodPath = methodPath.replace(/\/:([^/]+)/g, '/{$1}');
+                        const serviceName = this.serverless.service.service;
+                        const stage = this.serverless.service.provider.stage;
 
                         const documentation: any = {
                             summary: decorators?.["Summary"]?.[0]?.values?.[0],
@@ -389,6 +391,7 @@ class TsEDPlugin {
                         }
 
                         functions[functionName] = {
+                            name: `${serviceName}-${stage}-${functionName}`,
                             handler: `${handlerPath}.${key}`,
                             environment: options.environment,
                             memorySize: options.memorySize,
@@ -529,7 +532,7 @@ class TsEDPlugin {
             ...service.functions,
         };
         console.log(JSON.stringify(service.functions))
-        this.serverless.service.update({
+        service.update({
             functions: service.functions
         });
 
