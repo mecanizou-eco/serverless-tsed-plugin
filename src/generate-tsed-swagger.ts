@@ -33,7 +33,8 @@ function loadControllers(patterns: Array<string>): any[] {
     },
     swagger: [
         {
-            path: "/api-docs"
+            path: "/api-docs",
+            specVersion: "3.0.1"
         }
     ]
 })
