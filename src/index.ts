@@ -29,6 +29,7 @@ class TsEDPlugin {
     serverless: any;
     options: any;
     hooks: any;
+    resolvedSchemas = new Set();
 
     /**
      * Constructor to initialize the plugin with serverless and options.
@@ -253,6 +254,53 @@ class TsEDPlugin {
     }
 
     /**
+     * Resolve the schema recursively, handling $ref and avoiding infinite loops.
+     * @param schema - The schema to resolve.
+     * @param swagger - The Swagger definition containing the schemas.
+     * @param resolvedSchemas - A Map to keep track of resolved schemas.
+     * @returns The resolved schema.
+     */
+    resolveSchema(schema: any, swagger: any, resolvedSchemas = new Map()): any {
+        if (!schema) return undefined;
+
+        if (schema.$ref) {
+            const refPath = schema.$ref.replace(/^#\/definitions\//, '');
+            if (resolvedSchemas.has(refPath)) {
+                // Log to track already resolved schemas
+                console.log(`Schema already resolved: ${refPath}`);
+                return resolvedSchemas.get(refPath);
+            }
+
+            // Mark the schema as being resolved to detect circular references
+            resolvedSchemas.set(refPath, null);
+
+            const resolvedSchema = this.resolveSchema(swagger.definitions[refPath], swagger, resolvedSchemas);
+            resolvedSchemas.set(refPath, resolvedSchema);
+            return resolvedSchema;
+        }
+
+        if (schema.type === 'array' && schema.items) {
+            return {
+                ...schema,
+                items: this.resolveSchema(schema.items, swagger, resolvedSchemas)
+            };
+        }
+
+        if (schema.type === 'object' && schema.properties) {
+            const properties = Object.keys(schema.properties).reduce((acc: any, key: string) => {
+                acc[key] = this.resolveSchema(schema.properties[key], swagger, resolvedSchemas);
+                return acc;
+            }, {});
+            return {
+                ...schema,
+                properties
+            };
+        }
+
+        return schema;
+    }
+
+    /**
      * Extracts schema from Swagger definition.
      * @param modelName - The model name.
      * @param swagger - The Swagger definition.
@@ -263,7 +311,7 @@ class TsEDPlugin {
         if (swaggerDefinition) {
             return {
                 "$schema": "http://json-schema.org/draft-07/schema#",
-                ...swaggerDefinition
+                ...this.resolveSchema(swaggerDefinition, swagger)
             };
         }
 
