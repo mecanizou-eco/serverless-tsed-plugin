@@ -513,7 +513,7 @@ class TsEDPlugin {
             const decorators = method.getDecorators();
             decorators.forEach((decorator: any) => {
                 const name = decorator.getName();
-                if (['Get', 'Post', 'Put', 'Delete', 'Path'].includes(name)) {
+                if (['Get', 'Post', 'Put', 'Delete', 'Patch', 'Trace', 'Options', 'Connect', 'Head'].includes(name)) {
                     const args = decorator.getArguments();
                     methods.push({
                         key: method.getName(),
