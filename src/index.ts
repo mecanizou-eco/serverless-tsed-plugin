@@ -579,7 +579,7 @@ class TsEDPlugin {
             ...functions,
             ...service.functions,
         };
-        console.log(JSON.stringify(service.functions))
+
         service.update({
             functions: service.functions
         });
