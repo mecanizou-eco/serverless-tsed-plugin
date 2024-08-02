@@ -451,6 +451,8 @@ class TsEDPlugin {
                                         cors: options.events.http.cors,
                                         authorizer: this.hasAuthorizationHeader(decorators, options.authorizer.HeaderName) ? {
                                             name: options.authorizer.functionName,
+                                            type: 'REQUEST',
+                                            identityValidationExpression: '^Bearer [A-Za-z0-9-_]+\.([A-Za-z0-9-_]+)?\.([A-Za-z0-9-_]+)?$',
                                             identitySource: `method.request.header.${options.authorizer.HeaderName}`
                                         } : undefined,
                                         request: {
