@@ -324,7 +324,6 @@ class TsEDPlugin {
         if (swaggerDefinition) {
             return {
                 "$schema": "http://json-schema.org/draft-07/schema#",
-                "openapi": "3.0.0",
                 ...this.resolveSchema(swaggerDefinition, swagger)
             };
         }
