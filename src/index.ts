@@ -264,17 +264,24 @@ class TsEDPlugin {
         if (!schema) return undefined;
 
         if (schema.$ref) {
-            const refPath = schema.$ref.replace(/^#\/definitions\//, '');
+            // Ajuste para considerar a nova estrutura de componentes
+            let refPath = schema.$ref.replace(/^#\/definitions\//, '');
+            refPath = refPath.replace(/^#\/components\/schemas\//, '');
+
             if (resolvedSchemas.has(refPath)) {
-                // Log to track already resolved schemas
+                // Log para rastrear esquemas já resolvidos
                 console.log(`Schema already resolved: ${refPath}`);
                 return resolvedSchemas.get(refPath);
             }
 
-            // Mark the schema as being resolved to detect circular references
+            // Marcar o esquema como sendo resolvido para detectar referências circulares
             resolvedSchemas.set(refPath, null);
 
-            const resolvedSchema = this.resolveSchema(swagger.definitions[refPath], swagger, resolvedSchemas);
+            // Verificar em qual estrutura o esquema está (definitions ou components/schemas)
+            let resolvedSchema = swagger.definitions?.[refPath] || swagger.components?.schemas?.[refPath];
+
+            // Resolver o esquema e armazená-lo
+            resolvedSchema = this.resolveSchema(resolvedSchema, swagger, resolvedSchemas);
             resolvedSchemas.set(refPath, resolvedSchema);
             return resolvedSchema;
         }
@@ -307,7 +314,7 @@ class TsEDPlugin {
      * @returns The extracted schema.
      */
     extractSchemaFromSwagger(modelName: string, swagger: any): any {
-        const swaggerDefinition = swagger?.definitions?.[modelName];
+        const swaggerDefinition = swagger?.definitions?.[modelName] || swagger?.components?.schemas?.[modelName];
         if (swaggerDefinition) {
             return {
                 "$schema": "http://json-schema.org/draft-07/schema#",
