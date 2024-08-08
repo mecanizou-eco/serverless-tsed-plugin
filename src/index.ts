@@ -263,29 +263,28 @@ class TsEDPlugin {
     resolveSchema(schema: any, swagger: any, resolvedSchemas = new Map()): any {
         if (!schema) return undefined;
 
-        if (schema.$ref) {
-            // Ajuste para considerar a nova estrutura de componentes
-            let refPath = schema.$ref.replace(/^#\/definitions\//, '');
-            refPath = refPath.replace(/^#\/components\/schemas\//, '');
+        // Remove `openapi` key if present
+        if (schema.openapi) {
+            delete schema.openapi;
+        }
 
+        // Handle $ref (references to other schemas)
+        if (schema.$ref) {
+            const refPath = schema.$ref.replace(/^#\/(definitions|components\/schemas)\//, '');
             if (resolvedSchemas.has(refPath)) {
-                // Log para rastrear esquemas já resolvidos
-                console.log(`Schema already resolved: ${refPath}`);
                 return resolvedSchemas.get(refPath);
             }
 
-            // Marcar o esquema como sendo resolvido para detectar referências circulares
+            // Prevent circular references by temporarily setting to null
             resolvedSchemas.set(refPath, null);
 
-            // Verificar em qual estrutura o esquema está (definitions ou components/schemas)
-            let resolvedSchema = swagger.definitions?.[refPath] || swagger.components?.schemas?.[refPath];
-
-            // Resolver o esquema e armazená-lo
-            resolvedSchema = this.resolveSchema(resolvedSchema, swagger, resolvedSchemas);
+            // Recursively resolve the referenced schema
+            const resolvedSchema = this.resolveSchema(swagger.definitions?.[refPath] || swagger.components?.schemas?.[refPath], swagger, resolvedSchemas);
             resolvedSchemas.set(refPath, resolvedSchema);
             return resolvedSchema;
         }
 
+        // Handle array types
         if (schema.type === 'array' && schema.items) {
             return {
                 ...schema,
@@ -293,6 +292,7 @@ class TsEDPlugin {
             };
         }
 
+        // Handle object types
         if (schema.type === 'object' && schema.properties) {
             const properties = Object.keys(schema.properties).reduce((acc: any, key: string) => {
                 acc[key] = this.resolveSchema(schema.properties[key], swagger, resolvedSchemas);
@@ -302,6 +302,12 @@ class TsEDPlugin {
                 ...schema,
                 properties
             };
+        }
+
+        // Replace `nullable` keyword with a combination of types if present
+        if (schema.nullable) {
+            schema.type = Array.isArray(schema.type) ? [...schema.type, "null"] : [schema.type, "null"];
+            delete schema.nullable;
         }
 
         return schema;
