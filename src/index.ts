@@ -473,6 +473,17 @@ class TsEDPlugin {
                                                 "application/json": bodySchema
                                             } : undefined
                                         },
+                                        response: documentation.methodResponses.length > 0 ? documentation.methodResponses.reduce((acc: any, response: any) => {
+                                            acc[response.statusCode] = {
+                                                description: `Response for status code ${response.statusCode}`,
+                                                schema: response.responseBody.schema
+                                            };
+                                            return acc;
+                                        }, {}) : {
+                                            "200": {
+                                                description: 'Success'
+                                            }
+                                        },
                                         documentation: documentation
                                     }
                                 }
