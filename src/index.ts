@@ -374,8 +374,32 @@ class TsEDPlugin {
      * @returns An object representing the models for resources.
      */
     generateAPIGatewayModels(swagger: any): { [key: string]: any } {
-        const apiModels: { [key: string]: any } = {};
-        const documentationModels: { [key: string]: any } = {};
+        const apiModels: { [key: string]: any } = {
+            'EmptyModel': {
+                Type: "AWS::ApiGateway::Model",
+                Properties: {
+                    RestApiId: {
+                        Ref: "ApiGatewayRestApi"
+                    },
+                    ContentType: "application/json",
+                    Name: 'EmptyModel',
+                    Schema: {
+                        type: 'object',
+                        properties: {}
+                    }
+                }
+            }
+        };
+        const documentationModels: { [key: string]: any } = {
+            'EmptyModel': {
+                contentType: "application/json",
+                name: 'EmptyModel',
+                schema: {
+                    type: 'object',
+                    properties: {}
+                }
+            }
+        };
 
         const schemaNames = Object.keys(swagger?.definitions || {}).concat(Object.keys(swagger?.components?.schemas || {}));
         schemaNames.forEach(schemaName => {
