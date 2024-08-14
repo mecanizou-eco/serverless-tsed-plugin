@@ -156,7 +156,7 @@ class TsEDPlugin {
         await this.generateSwaggerFiles(options.patterns.controller);
 
         const swagger = await this.loadSwagger();
-        const models = this.generateAPIGatewayResourceModels(swagger);
+        const models = this.generateAPIGatewayModels(swagger);
         const functions = await this.processFiles(files, options, swagger);
 
         this.updateServerlessYml(functions, models);
@@ -373,14 +373,20 @@ class TsEDPlugin {
      * @param swagger - The Swagger definition.
      * @returns An object representing the models for resources.
      */
-    generateAPIGatewayResourceModels(swagger: any): { [key: string]: any } {
-        const models: { [key: string]: any } = {};
+    generateAPIGatewayModels(swagger: any): { [key: string]: any } {
+        const apiModels: { [key: string]: any } = {};
+        const documentationModels: { [key: string]: any } = {};
 
         const schemaNames = Object.keys(swagger?.definitions || {}).concat(Object.keys(swagger?.components?.schemas || {}));
         schemaNames.forEach(schemaName => {
             const schema = this.extractSchemaFromSwagger(schemaName, swagger);
             if (schema) {
-                models[schemaName] = {
+                documentationModels[schemaName+'Model'] = {
+                    contentType: "application/json",
+                    name: schemaName,
+                    schema: schema
+                };
+                apiModels[schemaName+'Model'] = {
                     Type: "AWS::ApiGateway::Model",
                     Properties: {
                         RestApiId: {
@@ -394,7 +400,21 @@ class TsEDPlugin {
             }
         });
 
-        return models;
+        return {
+            apiModels: apiModels,
+            documentationModels: documentationModels
+        };
+    }
+
+    /**
+     * Converte a primeira letra de uma string para maiúscula e o restante para minúscula.
+     *
+     * @param {string} text - A string que será convertida.
+     * @returns {string} - A string resultante com a primeira letra em maiúscula e as demais em minúscula.
+     */
+    capitalizeFirstLetter(text: string): string {
+        if (!text) return '';
+        return text.charAt(0).toUpperCase() + text.slice(1).toLowerCase();
     }
 
     /**
@@ -431,7 +451,12 @@ class TsEDPlugin {
                         const formattedMethodPath = methodPath.replace(/\/:([^/]+)/g, '/{$1}');
                         const serviceName = this.serverless.service.service;
                         const stage = this.serverless.service.provider.stage;
-                        const responses: any = {}
+                        const responses: any = {
+                            headers: {
+                                "Content-Type": "'application/json'"
+                            },
+                            statusCodes: {}
+                        };
                         const documentation: any = {
                             summary: decorators?.["Summary"]?.[0]?.values?.[0],
                             description: decorators?.["Description"]?.[0]?.values?.[0],
@@ -440,14 +465,18 @@ class TsEDPlugin {
                             pathParams: []
                         };
 
-                        let bodySchema = undefined;
+                        const bodySchema: any = {
+                            schema: undefined,
+                            name: undefined
+                        };
                         let handlerPath = path.relative(process.cwd(), moduleFile).replace(/\\/g, "/");
                         handlerPath = handlerPath.replace(/\.[tj]s$/, "");
 
                         if (decorators?.["BodyParams"]?.[0]) {
                             const requestBody = decorators["BodyParams"][0].values;
                             if (requestBody?.[0]) {
-                                bodySchema = this.extractSchemaFromSwagger(requestBody[0].type, swagger);
+                                bodySchema.schema = this.extractSchemaFromSwagger(requestBody[0].type, swagger);
+                                bodySchema.name = `${this.capitalizeFirstLetter(methodType)}${requestBody[0].type}`;
                             }
                         }
 
@@ -488,13 +517,45 @@ class TsEDPlugin {
                         if (decorators?.["Returns"]) {
                             decorators["Returns"].forEach((response) => {
                                 if (response?.values?.[1]) {
-                                    responses[response?.values?.[0]] = {
+                                    const schema = this.extractSchemaFromSwagger(response?.values?.[1], swagger);
+
+                                    responses.statusCodes[response?.values?.[0]] = {
                                         pattern: `.*"statusCode":${response?.values?.[0]},.*`,
-                                        template: `$input.path("$.${response?.values?.[1]}")`,
                                         headers: {
                                             "Content-Type": "application/json"
+                                        },
+                                        body: {
+                                            schema: schema
                                         }
-                                    }
+                                    };
+
+                                    documentation.methodResponses.push({
+                                        "statusCode": response?.values?.[0],
+                                        "responseModels": {
+                                            "application/json": response?.values?.[1]
+                                        },
+                                        "responseParameters": {
+                                            "method.response.header.Content-Type": true
+                                        }
+                                    })
+                                }
+                            })
+                        } else {
+                            const statusCode = methodType !== 'post' ? 200 : 201;
+                            responses.statusCodes[statusCode] = {
+                                pattern: '',
+                                headers: {
+                                    "Content-Type": "application/json"
+                                },
+                            };
+
+                            documentation.methodResponses.push({
+                                "statusCode": statusCode,
+                                "responseModels": {
+                                    "application/json": 'Empty'
+                                },
+                                "responseParameters": {
+                                    "method.response.header.Content-Type": true
                                 }
                             })
                         }
@@ -517,15 +578,14 @@ class TsEDPlugin {
                                             identitySource: `method.request.header.${options.authorizer.HeaderName}`
                                         } : undefined,
                                         request: {
-                                            schemas: bodySchema ? {
-                                                "application/json": bodySchema
+                                            schemas: bodySchema.schema ? {
+                                                "application/json": {
+                                                    schema: bodySchema.schema,
+                                                    name: bodySchema.name
+                                                },
                                             } : undefined
                                         },
-                                        response: Object.keys(responses).length > 0 ? responses : {
-                                            "200": {
-                                                pattern: ''
-                                            }
-                                        },
+                                        response: responses,
                                         documentation: documentation
                                     }
                                 }
@@ -649,14 +709,20 @@ class TsEDPlugin {
             ...service.functions,
         };
 
+        service.custom.documentation = {
+            ...apiGatewayModels.documentationModels,
+            ...service.custom.documentation,
+        };
+
         service.resources.Resources = {
-            ...apiGatewayModels,
+            ...apiGatewayModels.apiModels,
             ...service.resources.Resources,
         };
 
         service.update({
             functions: service.functions,
-            resources: service.resources
+            resources: service.resources,
+            custom: service.custom
         });
     }
 }
