@@ -509,7 +509,7 @@ class TsEDPlugin {
                                     http: {
                                         path: `${controllerPath}${formattedMethodPath || ""}`,
                                         method: methodType,
-                                        cors: options.events.http.cors,
+                                        cors: options?.events?.http?.cors || undefined,
                                         authorizer: this.hasAuthorizationHeader(decorators, options?.authorizer?.HeaderName) ? {
                                             name: options.authorizer.functionName,
                                             type: 'REQUEST',
