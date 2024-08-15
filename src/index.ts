@@ -265,7 +265,11 @@ class TsEDPlugin {
      * @param resolvedSchemas - A Map to keep track of resolved schemas.
      * @returns The resolved schema.
      */
-    resolveSchema(schema: any, swagger: any, resolvedSchemas = new Map()): any {
+    resolveSchema(
+        schema: any,
+        swagger: any,
+        resolvedSchemas: Map<string, any> = new Map()
+    ): any {
         if (!schema) return undefined;
 
         // Remove `openapi` key if present
@@ -280,11 +284,15 @@ class TsEDPlugin {
                 return resolvedSchemas.get(refPath);
             }
 
-            // Prevent circular references by temporarily setting to null
-            resolvedSchemas.set(refPath, null);
+            // Prevent circular references by temporarily setting to a placeholder
+            resolvedSchemas.set(refPath, {}); // Placeholder object to break circular references
 
             // Recursively resolve the referenced schema
-            const resolvedSchema = this.resolveSchema(swagger.definitions?.[refPath] || swagger.components?.schemas?.[refPath], swagger, resolvedSchemas);
+            const resolvedSchema = this.resolveSchema(
+                swagger.definitions?.[refPath] || swagger.components?.schemas?.[refPath],
+                swagger,
+                resolvedSchemas
+            );
             resolvedSchemas.set(refPath, resolvedSchema);
             return resolvedSchema;
         }
@@ -299,7 +307,7 @@ class TsEDPlugin {
 
         // Handle object types
         if (schema.type === 'object' && schema.properties) {
-            const properties = Object.keys(schema.properties).reduce((acc: any, key: string) => {
+            const properties = Object.keys(schema.properties).reduce((acc: Record<string, any>, key: string) => {
                 acc[key] = this.resolveSchema(schema.properties[key], swagger, resolvedSchemas);
                 return acc;
             }, {});
@@ -310,24 +318,24 @@ class TsEDPlugin {
         }
 
         // Handle anyOf, oneOf, allOf
-        ['anyOf', 'oneOf', 'allOf'].forEach(keyword => {
+        ['anyOf', 'oneOf', 'allOf'].forEach((keyword) => {
             if (schema[keyword]) {
-                schema[keyword] = schema[keyword].map((subSchema: any) => this.resolveSchema(subSchema, swagger, resolvedSchemas));
+                schema[keyword] = schema[keyword].map((subSchema: any) => {
+                    return this.resolveSchema(subSchema, swagger, resolvedSchemas);
+                });
             }
         });
 
         // Replace `nullable` keyword with a combination of types if present
         if (schema.nullable) {
             if (schema.anyOf || schema.oneOf || schema.allOf) {
-                // Add `null` type to each schema in `anyOf`, `oneOf`, or `allOf`
-                ['anyOf', 'oneOf', 'allOf'].forEach(keyword => {
+                ['anyOf', 'oneOf', 'allOf'].forEach((keyword) => {
                     if (schema[keyword]) {
-                        schema[keyword].push({ type: "null" });
+                        schema[keyword].push({ type: 'null' });
                     }
                 });
             } else {
-                // For schemas without `anyOf`, `oneOf`, or `allOf`
-                schema.type = Array.isArray(schema.type) ? [...schema.type, "null"] : [schema.type, "null"];
+                schema.type = Array.isArray(schema.type) ? [...schema.type, 'null'] : [schema.type, 'null'];
             }
             delete schema.nullable;
         }
