@@ -268,6 +268,7 @@ class TsEDPlugin {
     resolveSchema(
         schema: any,
         swagger: any,
+        definitions: Record<string, any>,
         resolvedSchemas: Map<string, any> = new Map()
     ): any {
         if (!schema) return undefined;
@@ -279,36 +280,45 @@ class TsEDPlugin {
 
         // Handle $ref (references to other schemas)
         if (schema.$ref) {
-            const refPath = schema.$ref.replace(/^#\/(definitions|components\/schemas)\//, '');
-            if (resolvedSchemas.has(refPath)) {
-                return resolvedSchemas.get(refPath);
+            const modelName = schema.$ref.replace(/^#\/(definitions|components\/schemas)\//, '');
+
+            if (resolvedSchemas.has(modelName)) {
+                return { $ref: `#/definitions/${modelName}` };
             }
 
             // Prevent circular references by temporarily setting to a placeholder
-            resolvedSchemas.set(refPath, {}); // Placeholder object to break circular references
+            resolvedSchemas.set(modelName, {}); // Placeholder object to break circular references
 
             // Recursively resolve the referenced schema
             const resolvedSchema = this.resolveSchema(
-                swagger.definitions?.[refPath] || swagger.components?.schemas?.[refPath],
+                swagger.definitions?.[modelName] || swagger.components?.schemas?.[modelName],
                 swagger,
+                definitions,
                 resolvedSchemas
             );
-            resolvedSchemas.set(refPath, resolvedSchema);
-            return resolvedSchema;
+
+            resolvedSchemas.set(modelName, resolvedSchema);
+            definitions[modelName] = resolvedSchema; // Add to definitions
+            return { $ref: `#/definitions/${modelName}` };
         }
 
         // Handle array types
         if (schema.type === 'array' && schema.items) {
             return {
                 ...schema,
-                items: this.resolveSchema(schema.items, swagger, resolvedSchemas)
+                items: this.resolveSchema(schema.items, swagger, definitions, resolvedSchemas)
             };
         }
 
         // Handle object types
         if (schema.type === 'object' && schema.properties) {
             const properties = Object.keys(schema.properties).reduce((acc: Record<string, any>, key: string) => {
-                acc[key] = this.resolveSchema(schema.properties[key], swagger, resolvedSchemas);
+                acc[key] = this.resolveSchema(schema.properties[key], swagger, definitions, resolvedSchemas);
+
+                if (acc[key] && acc[key].example) {
+                    delete acc[key].example;
+                }
+
                 return acc;
             }, {});
             return {
@@ -321,7 +331,7 @@ class TsEDPlugin {
         ['anyOf', 'oneOf', 'allOf'].forEach((keyword) => {
             if (schema[keyword]) {
                 schema[keyword] = schema[keyword].map((subSchema: any) => {
-                    return this.resolveSchema(subSchema, swagger, resolvedSchemas);
+                    return this.resolveSchema(subSchema, swagger, definitions, resolvedSchemas);
                 });
             }
         });
@@ -352,10 +362,19 @@ class TsEDPlugin {
     extractSchemaFromSwagger(modelName: string, swagger: any): any {
         const swaggerDefinition = swagger?.definitions?.[modelName] || swagger?.components?.schemas?.[modelName];
         if (swaggerDefinition) {
-            return {
+            const definitions: Record<string, any> = {};
+            const resolvedSchema = this.resolveSchema(swaggerDefinition, swagger, definitions);
+
+            const schema = {
                 "$schema": "http://json-schema.org/draft-07/schema#",
-                ...this.resolveSchema(swaggerDefinition, swagger)
+                "$ref": `#/definitions/${modelName}`,
+                "definitions": {
+                    ...definitions,
+                    [modelName]: resolvedSchema
+                }
             };
+
+            return schema;
         }
 
         return undefined;
