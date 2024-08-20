@@ -87,6 +87,7 @@ class TsEDPlugin {
         const decoratorStructure: DecoratorStructure = {};
         if (!method) return {};
 
+        // Verifica decoradores no método
         method.forEachDescendant(node => {
             if (node.getKind() === SyntaxKind.Decorator) {
                 const decoratorText = node.getText();
@@ -110,30 +111,25 @@ class TsEDPlugin {
             }
         });
 
-        method.getParameters().forEach(param => {
+        // Verifica decoradores nos parâmetros do método
+        method.getParameters().forEach((param, index) => {
             param.getDecorators().forEach(decorator => {
                 const decoratorName = decorator.getName();
                 if (!decoratorStructure[decoratorName]) {
                     decoratorStructure[decoratorName] = [];
                 }
 
-                method.getParameters().forEach((param, index) => {
-                    const decorators = param.getDecorators();
-                    decorators.forEach(decorator => {
-                        if (decorator.getText().includes(decoratorName)) {
-                            const paramName = param.getName();
-                            const paramTypeObj = param.getType();
-                            const paramTypeSymbol = paramTypeObj.getSymbol();
-                            const paramType = paramTypeSymbol ? paramTypeSymbol.getName() : paramTypeObj.getText();
+                const paramName = param.getName();
+                const paramTypeObj = param.getType();
+                const paramTypeSymbol = paramTypeObj.getSymbol();
+                const paramType = paramTypeSymbol ? paramTypeSymbol.getName() : paramTypeObj.getText();
 
-                            decoratorStructure[decoratorName][index] = { values: [], children: {} };
-
-                            decoratorStructure[decoratorName][index].values.push({
-                                name: paramName,
-                                type: paramType,
-                            });
-                        }
-                    });
+                decoratorStructure[decoratorName].push({
+                    values: [{
+                        name: paramName,
+                        type: paramType,
+                    }],
+                    children: {}
                 });
             });
         });
@@ -528,12 +524,6 @@ class TsEDPlugin {
                         const formattedMethodPath = methodPath.replace(/\/:([^/]+)/g, '/{$1}');
                         const serviceName = this.serverless.service.service;
                         const stage = this.serverless.service.provider.stage;
-                        const responses: any = {
-                            headers: {
-                                "Content-Type": "'application/json'"
-                            },
-                            statusCodes: {}
-                        };
                         const documentation: any = {
                             summary: decorators?.["Summary"]?.[0]?.values?.[0],
                             description: decorators?.["Description"]?.[0]?.values?.[0],
@@ -549,11 +539,13 @@ class TsEDPlugin {
                         let handlerPath = path.relative(process.cwd(), moduleFile).replace(/\\/g, "/");
                         handlerPath = handlerPath.replace(/\.[tj]s$/, "");
 
-                        if (decorators?.["BodyParams"]?.[0]) {
-                            const requestBody = decorators["BodyParams"][0].values;
-                            if (requestBody?.[0]) {
-                                bodySchema.schema = this.extractSchemaFromSwagger(requestBody[0].type, swagger);
-                                bodySchema.name = `${this.capitalizeFirstLetter(methodType)}${requestBody[0].type}`;
+                        if (decorators?.["BodyParams"]?.length > 0) {
+                            for (const bodyParams of decorators["BodyParams"]) {
+                                const requestBody = bodyParams.values;
+                                if (requestBody?.[0]) {
+                                    bodySchema.schema = this.extractSchemaFromSwagger(requestBody[0].type, swagger);
+                                    bodySchema.name = `${this.capitalizeFirstLetter(methodType)}${requestBody[0].type}`;
+                                }
                             }
                         }
 
@@ -594,18 +586,6 @@ class TsEDPlugin {
                         if (decorators?.["Returns"]) {
                             decorators["Returns"].forEach((response) => {
                                 if (response?.values?.[1]) {
-                                    const schema = this.extractSchemaFromSwagger(response?.values?.[1], swagger);
-
-                                    responses.statusCodes[response?.values?.[0]] = {
-                                        pattern: `.*"statusCode":${response?.values?.[0]},.*`,
-                                        headers: {
-                                            "Content-Type": "application/json"
-                                        },
-                                        body: {
-                                            schema: schema
-                                        }
-                                    };
-
                                     documentation.methodResponses.push({
                                         "statusCode": response?.values?.[0],
                                         "responseModels": {
@@ -619,12 +599,6 @@ class TsEDPlugin {
                             })
                         } else {
                             const statusCode = methodType !== 'post' ? 200 : 201;
-                            responses.statusCodes[statusCode] = {
-                                pattern: '',
-                                headers: {
-                                    "Content-Type": "application/json"
-                                },
-                            };
 
                             documentation.methodResponses.push({
                                 "statusCode": statusCode,
@@ -654,15 +628,11 @@ class TsEDPlugin {
                                             identityValidationExpression: '^Bearer [A-Za-z0-9-_]+\.([A-Za-z0-9-_]+)?\.([A-Za-z0-9-_]+)?$',
                                             identitySource: `method.request.header.${options.authorizer.HeaderName}`
                                         } : undefined,
-                                        request: {
-                                            schemas: bodySchema.schema ? {
-                                                "application/json": {
-                                                    schema: bodySchema.schema,
-                                                    name: bodySchema.name
-                                                },
-                                            } : undefined
-                                        },
-                                        response: responses,
+                                        requestModels: bodySchema.schema ? {
+                                            "application/json": {
+                                                Ref: bodySchema.schema
+                                            }
+                                        }: undefined,
                                         documentation: documentation
                                     }
                                 }
