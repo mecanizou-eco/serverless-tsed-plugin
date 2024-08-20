@@ -315,9 +315,35 @@ class TsEDPlugin {
             const properties = Object.keys(schema.properties).reduce((acc: Record<string, any>, key: string) => {
                 acc[key] = this.resolveSchema(schema.properties[key], swagger, definitions, resolvedSchemas);
 
-                if (acc[key] && acc[key].example) {
-                    delete acc[key].example;
-                }
+                // List of supported keywords by API Gateway
+                const supportedKeywords = [
+                    "$ref",
+                    "type",
+                    "properties",
+                    "required",
+                    "enum",
+                    "items",
+                    "minLength",
+                    "maxLength",
+                    "minimum",
+                    "maximum",
+                    "pattern",
+                    "format",
+                    "title",
+                    "description",
+                    "default",
+                    "allOf",
+                    "anyOf",
+                    "oneOf",
+                    "not"
+                ];
+
+                // Remove all keywords that are not in the list of supported ones
+                Object.keys(acc[key]).forEach((keyword) => {
+                    if (!supportedKeywords.includes(keyword)) {
+                        delete acc[key][keyword];
+                    }
+                });
 
                 return acc;
             }, {});
