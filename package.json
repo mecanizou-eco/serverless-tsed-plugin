@@ -3,7 +3,7 @@
   "version": "0.2.0",
   "main": "dist/index.js",
   "scripts": {
-    "cp": "cpx tsconfig.json dist/ && cpx src/plugin/generate-tsed-swagger.ts dist/",
+    "cp": "cpx tsconfig.json dist/ && cpx src/plugin/generate-tsed-swagger.ts dist/plugin",
     "build": "tsc && npm run cp",
     "watch": "tsc -w",
     "start": "concurrently -k -n COMPILER,SERVE \"npm run watch\" \"npm run cp\" \"nodemon dist/index.js\""
