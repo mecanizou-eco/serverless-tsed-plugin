@@ -15,6 +15,9 @@ jobs:
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
+        env:
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
         with:
           node-version: '20.x'
           registry-url: https://registry.npmjs.org/
@@ -27,6 +30,9 @@ jobs:
 
       - name: Prepare Semantic Release
         uses: cycjimmy/semantic-release-action@v4
+        env:
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
         with:
           semantic_version: 21
 
