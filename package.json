@@ -13,6 +13,7 @@
     "url": "https://github.com/mecanizou-eco/serverless-tsed-plugin"
   },
   "keywords": [
+    "aws",
     "tsed",
     "serverless",
     "documentation",
@@ -20,7 +21,6 @@
     "validation",
     "serverless framework",
     "serverless plugin",
-    "aws",
     "plugin",
     "typescript",
     "auto-generation",
