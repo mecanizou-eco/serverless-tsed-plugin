@@ -1,4 +1,4 @@
-name: Release Publish
+name: Release
 
 on:
   push:
@@ -23,6 +23,18 @@ jobs:
 
       - name: Build
         run: npm run build
+
+      - name: Prepare Semantic Release
+        uses: cycjimmy/semantic-release-action@v4
+        env:
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
+        with:
+          semantic_version: 21
+
+      - name: Run Semantic Release
+        run: npx semantic-release
+        env:
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
 
       - name: Publish
         run: npm publish --access public
