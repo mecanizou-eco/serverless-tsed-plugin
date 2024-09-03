@@ -1,9 +1,9 @@
 name: Release
 
 on:
-  pull_request:
+  push:
     branches:
-      - { "name": "release/*", "prerelease": true }
+      - 'releases/*'
 
 jobs:
   release:
