@@ -6,7 +6,7 @@ on:
       - 'release/*'
 
 jobs:
-  release:
+  pre-release:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
