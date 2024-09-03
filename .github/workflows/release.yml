@@ -25,13 +25,15 @@ jobs:
       - name: Build project
         run: npm run build
 
-      - name: Run semantic-release
+      - name: Semantic Release
         uses: cycjimmy/semantic-release-action@v4
         with:
           semantic_version: 21
         env:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
           GH_TOKEN: ${{ secrets.GH_TOKEN }}
+
+      - name: Run semantic-release
         run: |
           echo $NPM_TOKEN
           echo $GH_TOKEN
