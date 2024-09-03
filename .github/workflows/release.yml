@@ -31,11 +31,6 @@ jobs:
         with:
           semantic_version: 21
 
-      - name: Run Semantic Release
-        run: npx semantic-release
-        env:
-          GH_TOKEN: ${{ secrets.GH_TOKEN }}
-
       - name: Finalize Release
         if: success()
         run: echo "Release successful!"
