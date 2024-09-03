@@ -25,18 +25,17 @@ jobs:
       - name: Build project
         run: npm run build
 
-      - name: Test Token
-        run: |
-          npm config set //registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}
-          npm whoami
-
-      - name: Semantic Release
+      - name: Prepare Semantic Release
         uses: cycjimmy/semantic-release-action@v4
         with:
           semantic_version: 21
+
+      - name: Run Semantic Release
+        run: npx semantic-release
         env:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
           GH_TOKEN: ${{ secrets.GH_TOKEN }}
 
-      - name: Run Semantic Release
-        run: npx semantic-release
+      - name: Finalize Release
+        if: success()
+        run: echo "Release successful!"

@@ -12,18 +12,6 @@
     "type": "git",
     "url": "https://github.com/mecanizou-eco/serverless-tsed-plugin"
   },
-  "plugins": [
-    "@semantic-release/commit-analyzer",
-    "@semantic-release/release-notes-generator",
-    "@semantic-release/changelog",
-    {
-      "path": "@semantic-release/npm",
-      "npmPublish": true,
-      "tarballDir": "release"
-    },
-    "@semantic-release/github",
-    "@semantic-release/git"
-  ],
   "keywords": [
     "tsed",
     "serverless",
