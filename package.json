@@ -12,6 +12,18 @@
     "type": "git",
     "url": "https://github.com/mecanizou-eco/serverless-tsed-plugin"
   },
+  "plugins": [
+    "@semantic-release/commit-analyzer",
+    "@semantic-release/release-notes-generator",
+    "@semantic-release/changelog",
+    {
+      "path": "@semantic-release/npm",
+      "npmPublish": true,
+      "tarballDir": "release"
+    },
+    "@semantic-release/github",
+    "@semantic-release/git"
+  ],
   "keywords": [
     "tsed",
     "serverless",
@@ -36,6 +48,9 @@
     "ts-morph": "^22.0.0"
   },
   "devDependencies": {
+    "@semantic-release/changelog": "^6.0.3",
+    "@semantic-release/git": "^10.0.1",
+    "@semantic-release/npm": "^12.0.1",
     "@tsconfig/node18": "^18.2.4",
     "@tsed/common": "^7.71.1",
     "@tsed/core": "^7.71.1",
@@ -50,6 +65,7 @@
     "glob": "^10.4.1",
     "nodemon": "~3.1.4",
     "reflect-metadata": "^0.2.2",
+    "semantic-release": "^24.1.0",
     "serverless": "^4.0.24",
     "typescript": "^5.4.5",
     "yamljs": "^0.3.0"
