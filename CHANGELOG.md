@@ -1,3 +1,10 @@
+## [0.2.2](https://github.com/mecanizou-eco/serverless-tsed-plugin/compare/v0.2.1...v0.2.2) (2024-09-03)
+
+
+### Bug Fixes
+
+* test release minor ([6f4f10d](https://github.com/mecanizou-eco/serverless-tsed-plugin/commit/6f4f10d0b65d2e192e7d55b7f4fd69c087f83f78))
+
 ## [0.2.1](https://github.com/mecanizou-eco/serverless-tsed-plugin/compare/v0.2.0...v0.2.1) (2024-09-03)
 
 
