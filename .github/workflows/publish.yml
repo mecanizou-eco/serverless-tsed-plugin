@@ -25,6 +25,7 @@ jobs:
         run: npm run build
 
       - name: Semantic Release
+        if: success()
         uses: cycjimmy/semantic-release-action@v4
         env:
           GH_TOKEN: ${{ secrets.GH_TOKEN }}
