@@ -1,3 +1,10 @@
+## [0.2.6](https://github.com/mecanizou-eco/serverless-tsed-plugin/compare/v0.2.5...v0.2.6) (2024-09-05)
+
+
+### Bug Fixes
+
+* change project to mecanizou organization ([13b2c80](https://github.com/mecanizou-eco/serverless-tsed-plugin/commit/13b2c805ab537295b708498a25873c5bec4e6229))
+
 ## [0.2.5](https://github.com/mecanizou-eco/serverless-tsed-plugin/compare/v0.2.4...v0.2.5) (2024-09-05)
 
 
