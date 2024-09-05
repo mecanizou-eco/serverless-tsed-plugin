@@ -1,5 +1,5 @@
 {
-  "name": "serverless-tsed-plugin",
+  "name": "@mecanizou/serverless-tsed-plugin",
   "version": "0.2.0",
   "main": "dist/index.js",
   "scripts": {
