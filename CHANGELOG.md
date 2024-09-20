@@ -1,3 +1,10 @@
+## [0.2.7](https://github.com/mecanizou-eco/serverless-tsed-plugin/compare/v0.2.6...v0.2.7) (2024-09-20)
+
+
+### Bug Fixes
+
+* truncate function name when use more de 64 characteres ([61b1947](https://github.com/mecanizou-eco/serverless-tsed-plugin/commit/61b1947de492f67a1b4909bdec4b282676562d01))
+
 ## [0.2.6](https://github.com/mecanizou-eco/serverless-tsed-plugin/compare/v0.2.5...v0.2.6) (2024-09-05)
 
 

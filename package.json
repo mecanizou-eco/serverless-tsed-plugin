@@ -1,6 +1,6 @@
 {
   "name": "@mecanizou/serverless-tsed-plugin",
-  "version": "0.2.6",
+  "version": "0.2.7",
   "main": "dist/index.js",
   "scripts": {
     "cp": "cpx tsconfig.json dist/ && cpx src/plugin/generate-tsed-swagger.ts dist/plugin",
