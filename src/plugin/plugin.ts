@@ -487,6 +487,49 @@ class TsEDPlugin {
     }
 
     /**
+     * Trunca e concatena o serviceName, stage e functionName para garantir que a string resultante
+     * tenha no máximo 64 caracteres, preservando as partes essenciais de cada parâmetro.
+     *
+     * A função divide o comprimento máximo entre as três partes (`serviceName`, `stage`, `functionName`)
+     * e realiza truncamentos proporcionais caso o comprimento total exceda o limite de 64 caracteres.
+     *
+     * @param {string} serviceName - Nome do serviço, a primeira parte da string.
+     * @param {string} stage - Nome do ambiente (stage), a segunda parte da string.
+     * @param {string} functionName - Nome da função, a terceira parte da string.
+     * @returns {string} Uma string concatenada no formato `${serviceName}-${stage}-${functionName}` com no máximo 64 caracteres.
+     *
+     * @example
+     * const serviceName = "tracker-service";
+     * const stage = "production";
+     * const functionName = "get-tracker-orders-mecanibot-referenceid";
+     * const result = truncateString(serviceName, stage, functionName);
+     * console.log(result);
+     * // Saída: "track-serv-prod-get-tracker-orders-mecanibot-refid"
+     */
+    truncateString(serviceName: string, stage: string, functionName: string) {
+        const maxLength = 64;
+        const separatorLength = 2; // Dois hifens ("-")
+
+        // Cálculo do espaço disponível para cada parte da string
+        const totalLength = serviceName.length + stage.length + functionName.length + separatorLength;
+
+        if (totalLength > maxLength) {
+            const excessLength = totalLength - maxLength;
+
+            // Distribuir o excesso de forma proporcional ou dividir igualmente
+            const truncateServiceName = Math.max(serviceName.length - Math.ceil(excessLength / 3), 0);
+            const truncateStage = Math.max(stage.length - Math.floor(excessLength / 3), 0);
+            const truncateFunctionName = Math.max(functionName.length - Math.floor(excessLength / 3), 0);
+
+            serviceName = serviceName.slice(0, truncateServiceName);
+            stage = stage.slice(0, truncateStage);
+            functionName = functionName.slice(0, truncateFunctionName);
+        }
+
+        return `${serviceName}-${stage}-${functionName}`;
+    }
+
+    /**
      * Processes files to generate functions for Serverless.
      * @param files - The files to process.
      * @param options - The options for processing.
@@ -612,7 +655,7 @@ class TsEDPlugin {
                         }
 
                         functions[functionName] = {
-                            name: `${serviceName}-${stage}-${functionName}`,
+                            name: `${serviceName}-${stage}-${functionName}`.length <= 64 ? `${serviceName}-${stage}-${functionName}` : this.truncateString(serviceName, stage, functionName),
                             handler: `${handlerPath}.${key}`,
                             environment: options.environment,
                             memorySize: options.memorySize,
